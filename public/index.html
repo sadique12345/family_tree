@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kinship Atlas</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Shared family graph</p>
+          <h1>Kinship Atlas</h1>
+          <p class="hero-text">
+            Capture people, relationships, and family stories in a graph-backed tree that stays with the project file when you share it.
+          </p>
+        </div>
+        <div class="hero-stats" id="heroStats"></div>
+      </header>
+
+      <main class="layout">
+        <section class="panel form-panel">
+          <div class="section-heading">
+            <h2>Add a person</h2>
+            <p>Every profile is stored as a graph node.</p>
+          </div>
+          <form id="personForm" class="stack">
+            <div class="field-grid">
+              <label>
+                <span>Name</span>
+                <input name="name" required />
+              </label>
+              <label>
+                <span>Date of birth</span>
+                <input type="date" name="dateOfBirth" />
+              </label>
+              <label>
+                <span>Occupation</span>
+                <input name="occupation" />
+              </label>
+              <label>
+                <span>Personality type</span>
+                <input name="personalityType" placeholder="INFJ, ENTP, calm, witty..." />
+              </label>
+              <label>
+                <span>Email</span>
+                <input type="email" name="email" />
+              </label>
+              <label>
+                <span>Phone</span>
+                <input type="tel" name="phone" />
+              </label>
+            </div>
+            <label>
+              <span>Notes</span>
+              <textarea name="notes" rows="4"></textarea>
+            </label>
+            <button type="submit" class="primary-button">Save person</button>
+          </form>
+        </section>
+
+        <section class="panel form-panel">
+          <div class="section-heading">
+            <h2>Add a connection</h2>
+            <p>Every connection becomes an ontology-defined graph edge.</p>
+          </div>
+          <form id="relationshipForm" class="stack">
+            <label>
+              <span>From</span>
+              <select name="sourceId" id="sourceId" required></select>
+            </label>
+            <label>
+              <span>Relationship type</span>
+              <select name="type" id="relationshipType" required></select>
+            </label>
+            <label>
+              <span>To</span>
+              <select name="targetId" id="targetId" required></select>
+            </label>
+            <button type="submit" class="primary-button">Save connection</button>
+          </form>
+          <details class="ontology-box">
+            <summary class="ontology-summary">
+              <span>Ontology</span>
+              <span class="ontology-summary-note">Tap to expand</span>
+            </summary>
+            <div id="ontologyList" class="ontology-list"></div>
+          </details>
+        </section>
+
+        <section class="panel graph-panel">
+          <div class="section-heading">
+            <h2>Family graph</h2>
+            <p>Pan, zoom, and select people directly in the tree. Double-click a node or use the inspector to edit it.</p>
+          </div>
+          <div class="graph-toolbar">
+            <div class="graph-toolbar-group">
+              <button type="button" id="zoomOutButton" class="ghost-button icon-button" aria-label="Zoom out">-</button>
+              <button type="button" id="zoomResetButton" class="ghost-button">Reset view</button>
+              <button type="button" id="zoomInButton" class="ghost-button icon-button" aria-label="Zoom in">+</button>
+            </div>
+            <div class="graph-toolbar-group">
+              <button type="button" id="editSelectedButton" class="ghost-button" disabled>Edit selected</button>
+            </div>
+          </div>
+          <div class="graph-stage" id="graphStage">
+            <svg id="graphSvg" viewBox="0 0 1200 820" preserveAspectRatio="xMidYMid meet"></svg>
+          </div>
+          <div id="graphInspector" class="graph-inspector">
+            <div class="graph-inspector-empty">Select a node to inspect that person here.</div>
+          </div>
+        </section>
+
+        <section class="panel directory-panel">
+          <div class="section-heading">
+            <h2>People directory</h2>
+            <p>Profiles are editable and their ages are calculated from birth dates.</p>
+          </div>
+          <div id="peopleList" class="people-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <template id="personCardTemplate">
+      <article class="person-card">
+        <div class="person-card-head">
+          <div>
+            <h3 class="person-name"></h3>
+            <p class="person-meta"></p>
+          </div>
+          <button type="button" class="ghost-button edit-button">Edit</button>
+        </div>
+        <dl class="detail-grid"></dl>
+        <p class="person-notes"></p>
+      </article>
+    </template>
+
+    <dialog id="editDialog" class="dialog">
+      <div class="dialog-shell">
+        <div class="dialog-head">
+          <h3>Edit person</h3>
+          <button type="button" id="closeDialogButton" class="ghost-button">Close</button>
+        </div>
+        <div id="editStatus" class="status"></div>
+        <form id="editPersonForm" class="stack"></form>
+      </div>
+    </dialog>
+
+    <div id="status" class="toast" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

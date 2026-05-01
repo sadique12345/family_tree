@@ -1,0 +1,1652 @@
+{
+  "meta": {
+    "version": 1,
+    "title": "Family Graph",
+    "updatedAt": "2026-04-26T18:13:03.197Z"
+  },
+  "ontology": {
+    "FATHER_OF": {
+      "label": "Father of",
+      "shortLabel": "Father",
+      "inverse": "CHILD_OF",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the father of target person."
+    },
+    "MOTHER_OF": {
+      "label": "Mother of",
+      "shortLabel": "Mother",
+      "inverse": "CHILD_OF",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the mother of target person."
+    },
+    "PARENT_OF": {
+      "label": "Parent of",
+      "shortLabel": "Parent",
+      "inverse": "CHILD_OF",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is a parent of target person."
+    },
+    "CHILD_OF": {
+      "label": "Child of",
+      "shortLabel": "Child",
+      "inverse": "PARENT_OF",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is a child of target person."
+    },
+    "HUSBAND_OF": {
+      "label": "Husband of",
+      "shortLabel": "Husband",
+      "inverse": "WIFE_OF",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the husband of target person."
+    },
+    "WIFE_OF": {
+      "label": "Wife of",
+      "shortLabel": "Wife",
+      "inverse": "HUSBAND_OF",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the wife of target person."
+    },
+    "SPOUSE_OF": {
+      "label": "Spouse of",
+      "shortLabel": "Spouse",
+      "inverse": "SPOUSE_OF",
+      "category": "bidirectional",
+      "selectable": true,
+      "description": "Two people are spouses or life partners."
+    },
+    "BROTHER_OF": {
+      "label": "Brother of",
+      "shortLabel": "Brother",
+      "inverse": "BROTHER_OF",
+      "category": "bidirectional",
+      "selectable": true,
+      "description": "Two people are brothers."
+    },
+    "SISTER_OF": {
+      "label": "Sister of",
+      "shortLabel": "Sister",
+      "inverse": "SISTER_OF",
+      "category": "bidirectional",
+      "selectable": true,
+      "description": "Two people are sisters."
+    },
+    "SIBLING_OF": {
+      "label": "Sibling of",
+      "shortLabel": "Sibling",
+      "inverse": "SIBLING_OF",
+      "category": "bidirectional",
+      "selectable": true,
+      "description": "Two people are siblings."
+    },
+    "GRANDPARENT_OF": {
+      "label": "Grandparent of",
+      "shortLabel": "Grandparent",
+      "inverse": "GRANDCHILD_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is a grandparent of target person."
+    },
+    "GRANDCHILD_OF": {
+      "label": "Grandchild of",
+      "shortLabel": "Grandchild",
+      "inverse": "GRANDPARENT_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is a grandchild of target person."
+    },
+    "AUNT_UNCLE_OF": {
+      "label": "Aunt or uncle of",
+      "shortLabel": "Aunt/Uncle",
+      "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is an aunt or uncle of target person."
+    },
+    "NIECE_NEPHEW_OF_AUNT_UNCLE": {
+      "label": "Niece or nephew of aunt or uncle",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "AUNT_UNCLE_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is a niece or nephew of target person."
+    },
+    "MATERNAL_UNCLE_OF": {
+      "label": "Maternal uncle (Mama) of",
+      "shortLabel": "Mama",
+      "aliases": [
+        "mama"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_MATERNAL_UNCLE",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the mother's brother of target person."
+    },
+    "NIECE_NEPHEW_OF_MATERNAL_UNCLE": {
+      "label": "Niece or nephew of maternal uncle",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "MATERNAL_UNCLE_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's maternal uncle."
+    },
+    "MATERNAL_AUNT_OF": {
+      "label": "Maternal aunt (Mausi) of",
+      "shortLabel": "Mausi",
+      "aliases": [
+        "mausi"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_MATERNAL_AUNT",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the mother's sister of target person."
+    },
+    "NIECE_NEPHEW_OF_MATERNAL_AUNT": {
+      "label": "Niece or nephew of maternal aunt",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "MATERNAL_AUNT_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's maternal aunt."
+    },
+    "PATERNAL_UNCLE_OF": {
+      "label": "Paternal uncle (Chacha/Tau) of",
+      "shortLabel": "Chacha/Tau",
+      "aliases": [
+        "chacha",
+        "tau"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_PATERNAL_UNCLE",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the father's brother of target person."
+    },
+    "NIECE_NEPHEW_OF_PATERNAL_UNCLE": {
+      "label": "Niece or nephew of paternal uncle",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "PATERNAL_UNCLE_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's paternal uncle."
+    },
+    "PATERNAL_AUNT_OF": {
+      "label": "Paternal aunt (Bua/Phuphi) of",
+      "shortLabel": "Bua/Phuphi",
+      "aliases": [
+        "bua",
+        "phuphi"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_PATERNAL_AUNT",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the father's sister of target person."
+    },
+    "NIECE_NEPHEW_OF_PATERNAL_AUNT": {
+      "label": "Niece or nephew of paternal aunt",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "PATERNAL_AUNT_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's paternal aunt."
+    },
+    "WIFE_OF_MATERNAL_UNCLE_OF": {
+      "label": "Maternal uncle's wife (Mami) of",
+      "shortLabel": "Mami",
+      "aliases": [
+        "mami"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_MAMI",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the wife of target person's maternal uncle."
+    },
+    "NIECE_NEPHEW_OF_MAMI": {
+      "label": "Niece or nephew of maternal uncle's wife",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "WIFE_OF_MATERNAL_UNCLE_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's mami."
+    },
+    "HUSBAND_OF_MATERNAL_AUNT_OF": {
+      "label": "Maternal aunt's husband (Mausa) of",
+      "shortLabel": "Mausa",
+      "aliases": [
+        "mausa"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_MAUSA",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the husband of target person's maternal aunt."
+    },
+    "NIECE_NEPHEW_OF_MAUSA": {
+      "label": "Niece or nephew of maternal aunt's husband",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "HUSBAND_OF_MATERNAL_AUNT_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's mausa."
+    },
+    "WIFE_OF_PATERNAL_UNCLE_OF": {
+      "label": "Paternal uncle's wife (Chachi/Tai) of",
+      "shortLabel": "Chachi/Tai",
+      "aliases": [
+        "chachi",
+        "tai"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_CHACHI",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the wife of target person's paternal uncle."
+    },
+    "NIECE_NEPHEW_OF_CHACHI": {
+      "label": "Niece or nephew of paternal uncle's wife",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "WIFE_OF_PATERNAL_UNCLE_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's chachi."
+    },
+    "HUSBAND_OF_PATERNAL_AUNT_OF": {
+      "label": "Paternal aunt's husband (Phupha) of",
+      "shortLabel": "Phupha",
+      "aliases": [
+        "phupha"
+      ],
+      "inverse": "NIECE_NEPHEW_OF_PHUPHA",
+      "category": "directed",
+      "selectable": true,
+      "description": "Source person is the husband of target person's paternal aunt."
+    },
+    "NIECE_NEPHEW_OF_PHUPHA": {
+      "label": "Niece or nephew of paternal aunt's husband",
+      "shortLabel": "Niece/Nephew",
+      "inverse": "HUSBAND_OF_PATERNAL_AUNT_OF",
+      "category": "directed",
+      "selectable": false,
+      "description": "Source person is the niece or nephew of target person's phupha."
+    }
+  },
+  "nodes": [
+    {
+      "id": "person_kx75w5br",
+      "kind": "Person",
+      "name": "sadique",
+      "dateOfBirth": "1993-03-05",
+      "occupation": "AVP",
+      "personalityType": "404 not found",
+      "email": "sadiquereyaz533@gmail.com",
+      "phone": "8084863615",
+      "notes": "",
+      "createdAt": "2026-04-26T12:51:01.848Z",
+      "updatedAt": "2026-04-26T12:51:01.848Z"
+    },
+    {
+      "id": "person_ifno4v7v",
+      "kind": "Person",
+      "name": "sadia",
+      "dateOfBirth": "1987-06-30",
+      "occupation": "teacher",
+      "personalityType": "creative",
+      "email": "sadiareyaz@yahoo.co.in",
+      "phone": "9852224290",
+      "notes": "",
+      "createdAt": "2026-04-26T12:52:31.158Z",
+      "updatedAt": "2026-04-26T12:52:31.158Z"
+    },
+    {
+      "id": "person_37lth00e",
+      "kind": "Person",
+      "name": "Sanjari Khatoon",
+      "dateOfBirth": "1964-02-10",
+      "occupation": "house wife",
+      "personalityType": "emotional",
+      "email": "",
+      "phone": "9430518325",
+      "notes": "",
+      "createdAt": "2026-04-26T12:54:20.357Z",
+      "updatedAt": "2026-04-26T12:54:20.357Z"
+    },
+    {
+      "id": "person_1lec42a7",
+      "kind": "Person",
+      "name": "Mohammad Reyazuddin",
+      "dateOfBirth": "1963-01-01",
+      "occupation": "Superintendent engineer",
+      "personalityType": "Gem",
+      "email": "",
+      "phone": "9430518325",
+      "notes": "",
+      "createdAt": "2026-04-26T13:37:41.950Z",
+      "updatedAt": "2026-04-26T13:37:41.950Z"
+    },
+    {
+      "id": "person_uoq3wneg",
+      "kind": "Person",
+      "name": "Nazeef",
+      "dateOfBirth": "2005-10-05",
+      "occupation": "student",
+      "personalityType": "social",
+      "email": "",
+      "phone": "",
+      "notes": "",
+      "createdAt": "2026-04-26T13:39:18.449Z",
+      "updatedAt": "2026-04-26T13:39:18.449Z"
+    },
+    {
+      "id": "person_dh4ti8i1",
+      "kind": "Person",
+      "name": "Rubina Rafiqui",
+      "dateOfBirth": "1983-08-02",
+      "occupation": "housewife",
+      "personalityType": "mature",
+      "email": "",
+      "phone": "",
+      "notes": "",
+      "createdAt": "2026-04-26T13:41:39.869Z",
+      "updatedAt": "2026-04-26T13:41:39.869Z"
+    },
+    {
+      "id": "person_ad7ep0w1",
+      "kind": "Person",
+      "name": "Ayaan",
+      "dateOfBirth": "2010-11-15",
+      "occupation": "student",
+      "personalityType": "intelligent",
+      "email": "",
+      "phone": "8951053308",
+      "notes": "",
+      "createdAt": "2026-04-26T18:09:27.148Z",
+      "updatedAt": "2026-04-26T18:09:27.148Z"
+    },
+    {
+      "id": "person_nk79xupu",
+      "kind": "Person",
+      "name": "Rashid Reyaz",
+      "dateOfBirth": "1989-12-27",
+      "occupation": "Software Engineer",
+      "personalityType": "calculative",
+      "email": "",
+      "phone": "7506772989",
+      "notes": "",
+      "createdAt": "2026-04-26T18:12:47.943Z",
+      "updatedAt": "2026-04-26T18:12:47.943Z"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_09farp9y",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_dh4ti8i1",
+      "type": "FATHER_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Father of",
+        "shortLabel": "Father",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the father of target person."
+      }
+    },
+    {
+      "id": "edge_s8mvtoh0",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:38:20.511Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_ifno4v7v",
+      "type": "FATHER_OF",
+      "origin": "explicit",
+      "ontology": {
+        "label": "Father of",
+        "shortLabel": "Father",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the father of target person."
+      }
+    },
+    {
+      "id": "edge_dgjmsg8l",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_kx75w5br",
+      "type": "FATHER_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Father of",
+        "shortLabel": "Father",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the father of target person."
+      }
+    },
+    {
+      "id": "edge_ul2z7j4l",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_nk79xupu",
+      "type": "FATHER_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Father of",
+        "shortLabel": "Father",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the father of target person."
+      }
+    },
+    {
+      "id": "edge_nns0motp",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_ad7ep0w1",
+      "type": "GRANDPARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandparent of",
+        "shortLabel": "Grandparent",
+        "inverse": "GRANDCHILD_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandparent of target person."
+      }
+    },
+    {
+      "id": "edge_fj1nuzkt",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_uoq3wneg",
+      "type": "GRANDPARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandparent of",
+        "shortLabel": "Grandparent",
+        "inverse": "GRANDCHILD_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandparent of target person."
+      }
+    },
+    {
+      "id": "edge_aq59ioa2",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:37:54.250Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_37lth00e",
+      "type": "HUSBAND_OF",
+      "origin": "explicit",
+      "ontology": {
+        "label": "Husband of",
+        "shortLabel": "Husband",
+        "inverse": "WIFE_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the husband of target person."
+      }
+    },
+    {
+      "id": "edge_9my2cv2z",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_dh4ti8i1",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_rkfzz5mz",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_ifno4v7v",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "specific-parent-to-parent",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_8p2ma5fa",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_kx75w5br",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_xa7tby1q",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_nk79xupu",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_zoqpnq7b",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_1lec42a7",
+      "targetId": "person_37lth00e",
+      "type": "SPOUSE_OF",
+      "origin": "inferred",
+      "inferredBy": "specific-spouse-to-spouse",
+      "ontology": {
+        "label": "Spouse of",
+        "shortLabel": "Spouse",
+        "inverse": "SPOUSE_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are spouses or life partners."
+      }
+    },
+    {
+      "id": "edge_u4tju0d3",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_ad7ep0w1",
+      "type": "GRANDPARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandparent of",
+        "shortLabel": "Grandparent",
+        "inverse": "GRANDCHILD_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandparent of target person."
+      }
+    },
+    {
+      "id": "edge_7csgu5du",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_uoq3wneg",
+      "type": "GRANDPARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandparent of",
+        "shortLabel": "Grandparent",
+        "inverse": "GRANDCHILD_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandparent of target person."
+      }
+    },
+    {
+      "id": "edge_3j0zkgjj",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_dh4ti8i1",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_vpk4c1za",
+      "kind": "Relationship",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_ifno4v7v",
+      "type": "PARENT_OF",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      },
+      "createdAt": "2026-04-26T12:54:38.989Z",
+      "origin": "explicit"
+    },
+    {
+      "id": "edge_6997hbwb",
+      "kind": "Relationship",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_kx75w5br",
+      "type": "PARENT_OF",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      },
+      "createdAt": "2026-04-26T12:54:29.294Z",
+      "origin": "explicit"
+    },
+    {
+      "id": "edge_nmrx4hoo",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_nk79xupu",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_yrjve2gj",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_1lec42a7",
+      "type": "SPOUSE_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_zoqpnq7b",
+      "symmetric": true,
+      "inferredBy": "specific-spouse-to-spouse",
+      "ontology": {
+        "label": "Spouse of",
+        "shortLabel": "Spouse",
+        "inverse": "SPOUSE_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are spouses or life partners."
+      }
+    },
+    {
+      "id": "edge_zslpqdsv",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:37:54.250Z",
+      "sourceId": "person_37lth00e",
+      "targetId": "person_1lec42a7",
+      "type": "WIFE_OF",
+      "origin": "explicit",
+      "mirroredFrom": "edge_aq59ioa2",
+      "symmetric": false,
+      "ontology": {
+        "label": "Wife of",
+        "shortLabel": "Wife",
+        "inverse": "HUSBAND_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the wife of target person."
+      }
+    },
+    {
+      "id": "edge_x8m2qych",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:10:07.070Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_uoq3wneg",
+      "type": "BROTHER_OF",
+      "origin": "explicit",
+      "ontology": {
+        "label": "Brother of",
+        "shortLabel": "Brother",
+        "inverse": "BROTHER_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are brothers."
+      }
+    },
+    {
+      "id": "edge_rscrbvtk",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_dh4ti8i1",
+      "type": "CHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_qnzy7834",
+      "symmetric": false,
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_tiilljzh",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_1lec42a7",
+      "type": "GRANDCHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_nns0motp",
+      "symmetric": false,
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandchild of",
+        "shortLabel": "Grandchild",
+        "inverse": "GRANDPARENT_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandchild of target person."
+      }
+    },
+    {
+      "id": "edge_vagg9i66",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_37lth00e",
+      "type": "GRANDCHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_u4tju0d3",
+      "symmetric": false,
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandchild of",
+        "shortLabel": "Grandchild",
+        "inverse": "GRANDPARENT_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandchild of target person."
+      }
+    },
+    {
+      "id": "edge_5vkx9heq",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_ifno4v7v",
+      "type": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "origin": "inferred",
+      "mirroredFrom": "edge_6aqr8hs5",
+      "symmetric": false,
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Niece or nephew of aunt or uncle",
+        "shortLabel": "Niece/Nephew",
+        "inverse": "AUNT_UNCLE_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a niece or nephew of target person."
+      }
+    },
+    {
+      "id": "edge_athdr6wz",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_kx75w5br",
+      "type": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "origin": "inferred",
+      "mirroredFrom": "edge_7l8pknuk",
+      "symmetric": false,
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Niece or nephew of aunt or uncle",
+        "shortLabel": "Niece/Nephew",
+        "inverse": "AUNT_UNCLE_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a niece or nephew of target person."
+      }
+    },
+    {
+      "id": "edge_z6zh0qf5",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_nk79xupu",
+      "type": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "origin": "inferred",
+      "mirroredFrom": "edge_zcdbghk5",
+      "symmetric": false,
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Niece or nephew of aunt or uncle",
+        "shortLabel": "Niece/Nephew",
+        "inverse": "AUNT_UNCLE_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a niece or nephew of target person."
+      }
+    },
+    {
+      "id": "edge_z15yvely",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ad7ep0w1",
+      "targetId": "person_uoq3wneg",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "inferredBy": "specific-sibling-to-sibling",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_qjen9dld",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_1lec42a7",
+      "type": "CHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_09farp9y",
+      "symmetric": false,
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_2p0frhuj",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_37lth00e",
+      "type": "CHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_3j0zkgjj",
+      "symmetric": false,
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_qnzy7834",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_ad7ep0w1",
+      "type": "MOTHER_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Mother of",
+        "shortLabel": "Mother",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the mother of target person."
+      }
+    },
+    {
+      "id": "edge_ah0sga6p",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:42:13.819Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_uoq3wneg",
+      "type": "MOTHER_OF",
+      "origin": "explicit",
+      "ontology": {
+        "label": "Mother of",
+        "shortLabel": "Mother",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is the mother of target person."
+      }
+    },
+    {
+      "id": "edge_qca2s31k",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_ad7ep0w1",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_h6ul3pux",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_uoq3wneg",
+      "type": "PARENT_OF",
+      "origin": "inferred",
+      "inferredBy": "specific-parent-to-parent",
+      "ontology": {
+        "label": "Parent of",
+        "shortLabel": "Parent",
+        "inverse": "CHILD_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a parent of target person."
+      }
+    },
+    {
+      "id": "edge_m8nfjuhc",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_ifno4v7v",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_o7xpef4u",
+      "symmetric": true,
+      "inferredBy": "shared-parent-implies-siblings",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_sqrizi0x",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:41:56.402Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_kx75w5br",
+      "type": "SIBLING_OF",
+      "origin": "explicit",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_7c5arm7k",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_dh4ti8i1",
+      "targetId": "person_nk79xupu",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_xddpv80m",
+      "symmetric": true,
+      "inferredBy": "shared-parent-implies-siblings",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_6aqr8hs5",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_ad7ep0w1",
+      "type": "AUNT_UNCLE_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Aunt or uncle of",
+        "shortLabel": "Aunt/Uncle",
+        "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is an aunt or uncle of target person."
+      }
+    },
+    {
+      "id": "edge_6ubdw3h7",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_uoq3wneg",
+      "type": "AUNT_UNCLE_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Aunt or uncle of",
+        "shortLabel": "Aunt/Uncle",
+        "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is an aunt or uncle of target person."
+      }
+    },
+    {
+      "id": "edge_xf7lrkhl",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:38:20.511Z",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_1lec42a7",
+      "type": "CHILD_OF",
+      "origin": "explicit",
+      "mirroredFrom": "edge_s8mvtoh0",
+      "symmetric": false,
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_ptuol0he",
+      "kind": "Relationship",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_37lth00e",
+      "type": "CHILD_OF",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      },
+      "createdAt": "2026-04-26T12:54:38.989Z",
+      "mirroredFrom": "edge_vpk4c1za",
+      "symmetric": false,
+      "origin": "explicit"
+    },
+    {
+      "id": "edge_o7xpef4u",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_dh4ti8i1",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-implies-siblings",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_6e5lejw4",
+      "kind": "Relationship",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_kx75w5br",
+      "type": "SIBLING_OF",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      },
+      "createdAt": "2026-04-26T12:52:50.823Z",
+      "mirroredFrom": "edge_an8l29b7",
+      "symmetric": true,
+      "origin": "explicit"
+    },
+    {
+      "id": "edge_vcecpdxj",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_ifno4v7v",
+      "targetId": "person_nk79xupu",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-implies-siblings",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_7l8pknuk",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_ad7ep0w1",
+      "type": "AUNT_UNCLE_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Aunt or uncle of",
+        "shortLabel": "Aunt/Uncle",
+        "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is an aunt or uncle of target person."
+      }
+    },
+    {
+      "id": "edge_pfhbtoeu",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_uoq3wneg",
+      "type": "AUNT_UNCLE_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Aunt or uncle of",
+        "shortLabel": "Aunt/Uncle",
+        "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is an aunt or uncle of target person."
+      }
+    },
+    {
+      "id": "edge_uobq0tlp",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.180Z",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_nk79xupu",
+      "type": "BROTHER_OF",
+      "origin": "explicit",
+      "mirroredFrom": "edge_16gxs0i1",
+      "symmetric": true,
+      "ontology": {
+        "label": "Brother of",
+        "shortLabel": "Brother",
+        "inverse": "BROTHER_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are brothers."
+      }
+    },
+    {
+      "id": "edge_f4zkx91y",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_1lec42a7",
+      "type": "CHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_dgjmsg8l",
+      "symmetric": false,
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_mm6htxec",
+      "kind": "Relationship",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_37lth00e",
+      "type": "CHILD_OF",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      },
+      "createdAt": "2026-04-26T12:54:29.294Z",
+      "mirroredFrom": "edge_6997hbwb",
+      "symmetric": false,
+      "origin": "explicit"
+    },
+    {
+      "id": "edge_jip65tc9",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:41:56.402Z",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_dh4ti8i1",
+      "type": "SIBLING_OF",
+      "origin": "explicit",
+      "mirroredFrom": "edge_sqrizi0x",
+      "symmetric": true,
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_an8l29b7",
+      "kind": "Relationship",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_ifno4v7v",
+      "type": "SIBLING_OF",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      },
+      "createdAt": "2026-04-26T12:52:50.823Z",
+      "origin": "explicit"
+    },
+    {
+      "id": "edge_pukxfi7o",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_kx75w5br",
+      "targetId": "person_nk79xupu",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "inferredBy": "specific-sibling-to-sibling",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_zcdbghk5",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_ad7ep0w1",
+      "type": "AUNT_UNCLE_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Aunt or uncle of",
+        "shortLabel": "Aunt/Uncle",
+        "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is an aunt or uncle of target person."
+      }
+    },
+    {
+      "id": "edge_58sg5ulf",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_uoq3wneg",
+      "type": "AUNT_UNCLE_OF",
+      "origin": "inferred",
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Aunt or uncle of",
+        "shortLabel": "Aunt/Uncle",
+        "inverse": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is an aunt or uncle of target person."
+      }
+    },
+    {
+      "id": "edge_16gxs0i1",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.180Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_kx75w5br",
+      "type": "BROTHER_OF",
+      "origin": "explicit",
+      "ontology": {
+        "label": "Brother of",
+        "shortLabel": "Brother",
+        "inverse": "BROTHER_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are brothers."
+      }
+    },
+    {
+      "id": "edge_6h9sq693",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_1lec42a7",
+      "type": "CHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_ul2z7j4l",
+      "symmetric": false,
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_r2w084b0",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_37lth00e",
+      "type": "CHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_nmrx4hoo",
+      "symmetric": false,
+      "inferredBy": "shared-parent-across-siblings",
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_xddpv80m",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_dh4ti8i1",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "inferredBy": "shared-parent-implies-siblings",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_5m2mx9uk",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_ifno4v7v",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_vcecpdxj",
+      "symmetric": true,
+      "inferredBy": "shared-parent-implies-siblings",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_ft9t9pz4",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_nk79xupu",
+      "targetId": "person_kx75w5br",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_pukxfi7o",
+      "symmetric": true,
+      "inferredBy": "specific-sibling-to-sibling",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    },
+    {
+      "id": "edge_er5nm29u",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:10:07.070Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_ad7ep0w1",
+      "type": "BROTHER_OF",
+      "origin": "explicit",
+      "mirroredFrom": "edge_x8m2qych",
+      "symmetric": true,
+      "ontology": {
+        "label": "Brother of",
+        "shortLabel": "Brother",
+        "inverse": "BROTHER_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are brothers."
+      }
+    },
+    {
+      "id": "edge_9tzd29o2",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T13:42:13.819Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_dh4ti8i1",
+      "type": "CHILD_OF",
+      "origin": "explicit",
+      "mirroredFrom": "edge_ah0sga6p",
+      "symmetric": false,
+      "ontology": {
+        "label": "Child of",
+        "shortLabel": "Child",
+        "inverse": "PARENT_OF",
+        "category": "directed",
+        "selectable": true,
+        "description": "Source person is a child of target person."
+      }
+    },
+    {
+      "id": "edge_1apx0iur",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_1lec42a7",
+      "type": "GRANDCHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_fj1nuzkt",
+      "symmetric": false,
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandchild of",
+        "shortLabel": "Grandchild",
+        "inverse": "GRANDPARENT_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandchild of target person."
+      }
+    },
+    {
+      "id": "edge_heoyjvg6",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_37lth00e",
+      "type": "GRANDCHILD_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_7csgu5du",
+      "symmetric": false,
+      "inferredBy": "parent-chain-to-grandparent",
+      "ontology": {
+        "label": "Grandchild of",
+        "shortLabel": "Grandchild",
+        "inverse": "GRANDPARENT_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a grandchild of target person."
+      }
+    },
+    {
+      "id": "edge_389axkpu",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_ifno4v7v",
+      "type": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "origin": "inferred",
+      "mirroredFrom": "edge_6ubdw3h7",
+      "symmetric": false,
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Niece or nephew of aunt or uncle",
+        "shortLabel": "Niece/Nephew",
+        "inverse": "AUNT_UNCLE_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a niece or nephew of target person."
+      }
+    },
+    {
+      "id": "edge_c6y83gwd",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_kx75w5br",
+      "type": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "origin": "inferred",
+      "mirroredFrom": "edge_pfhbtoeu",
+      "symmetric": false,
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Niece or nephew of aunt or uncle",
+        "shortLabel": "Niece/Nephew",
+        "inverse": "AUNT_UNCLE_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a niece or nephew of target person."
+      }
+    },
+    {
+      "id": "edge_yr1tulr1",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_nk79xupu",
+      "type": "NIECE_NEPHEW_OF_AUNT_UNCLE",
+      "origin": "inferred",
+      "mirroredFrom": "edge_58sg5ulf",
+      "symmetric": false,
+      "inferredBy": "parent-sibling-to-aunt-uncle",
+      "ontology": {
+        "label": "Niece or nephew of aunt or uncle",
+        "shortLabel": "Niece/Nephew",
+        "inverse": "AUNT_UNCLE_OF",
+        "category": "directed",
+        "selectable": false,
+        "description": "Source person is a niece or nephew of target person."
+      }
+    },
+    {
+      "id": "edge_2s81bm02",
+      "kind": "Relationship",
+      "createdAt": "2026-04-26T18:13:03.195Z",
+      "sourceId": "person_uoq3wneg",
+      "targetId": "person_ad7ep0w1",
+      "type": "SIBLING_OF",
+      "origin": "inferred",
+      "mirroredFrom": "edge_z15yvely",
+      "symmetric": true,
+      "inferredBy": "specific-sibling-to-sibling",
+      "ontology": {
+        "label": "Sibling of",
+        "shortLabel": "Sibling",
+        "inverse": "SIBLING_OF",
+        "category": "bidirectional",
+        "selectable": true,
+        "description": "Two people are siblings."
+      }
+    }
+  ]
+}
