@@ -133,6 +133,7 @@ const server = http.createServer(async (request, response) => {
 
     await serveStatic(url.pathname, response);
   } catch (error) {
+    console.error("CRITICAL ERROR:", error);
     const statusCode = error instanceof SyntaxError ? 400 : 500;
     sendJson(response, statusCode, {
       error: error.message || "Unexpected error"
