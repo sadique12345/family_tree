@@ -5,8 +5,8 @@ export function createDatabase({ graphFile }) {
   const backend = process.env.GRAPH_BACKEND || "file";
 
   if (backend === "neo4j") {
-    const httpUrl = "https://5eaa5b4d.neo4j.io/db/neo4j/tx/commit";
-    const username = "neo4j";
+    const httpUrl = "https://5eaa5b4d.databases.neo4j.io/db/neo4j/tx/commit";
+    const username = "5eaa5b4d";
     const password = "BosMVLmr3cradeCkxwmXg98gYZigoLUgGwvKa0iVAcQ";
 
     if (!httpUrl || !username || !password) {
