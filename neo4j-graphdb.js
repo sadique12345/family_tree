@@ -10,14 +10,6 @@ import {
   normalizeText
 } from "./graph-core.js";
 
-function rowToObject(fields, values) {
-  const result = {};
-  fields.forEach((field, index) => {
-    result[field] = values[index];
-  });
-  return result;
-}
-
 export class Neo4jGraphDatabase {
   constructor(options) {
     this.httpUrl = options.httpUrl.replace(/\/$/, "");
@@ -41,29 +33,25 @@ export class Neo4jGraphDatabase {
         Authorization: `Basic ${Buffer.from(`${this.username}:${this.password}`).toString("base64")}`
       },
       body: JSON.stringify({
-        statement,
-        parameters
+        statements: [
+          {
+            statement,
+            parameters
+          }
+        ]
       })
     });
 
-    const rawText = await response.text();
-    let payload = {};
-    try {
-      payload = rawText ? JSON.parse(rawText) : {};
-    } catch {
-      payload = { rawText };
-    }
-
     if (!response.ok) {
-      const message = payload.message || payload.error || payload.rawText || `Neo4j request failed with status ${response.status}.`;
-      throw new Error(`Neo4j request failed with status ${response.status}: ${message}`);
+      throw new Error(`Neo4j request failed with status ${response.status}.`);
     }
 
+    const payload = await response.json();
     if (payload.errors?.length) {
       throw new Error(payload.errors[0].message || "Neo4j query failed.");
     }
 
-    return payload;
+    return payload.results?.[0] || { data: [] };
   }
 
   async ensureInitialized() {
@@ -78,23 +66,184 @@ export class Neo4jGraphDatabase {
 
   async readGraph() {
     await this.ensureInitialized();
-    const payload = await this.runQuery(`
-      OPTIONAL MATCH (m:GraphMeta {key: 'family'})
+    const result = await this.runQuery(`
+      MATCH (m:GraphMeta {key: 'family'})
       WITH m
       OPTIONAL MATCH (p:Person)
-      WITH m, collect(CASE WHEN p IS NULL THEN null ELSE properties(p) END) AS nodes
+      WITH m, collect(properties(p)) AS nodes
       OPTIONAL MATCH (source:Person)-[r:KINSHIP]->(target:Person)
       RETURN
         coalesce(m.version, 1) AS version,
         coalesce(m.title, 'Family Graph') AS title,
         m.updatedAt AS updatedAt,
-        [node IN nodes WHERE node IS NOT NULL] AS nodes,
-        [edge IN collect(
+        nodes,
+        collect(
           CASE
             WHEN r IS NULL THEN null
             ELSE properties(r) + {sourceId: source.id, targetId: target.id}
           END
-        ) WHERE edge IS NOT NULL] AS edges
+        ) AS edges
     `);
 
-    const fields = payload.data?.fields || [];
+    const row = result.data?.[0]?.row;
+    if (!row) {
+      return { ...EMPTY_GRAPH };
+    }
+
+    const [version, title, updatedAt, nodes, edges] = row;
+    return {
+      meta: {
+        version: version || 1,
+        title: title || "Family Graph",
+        updatedAt: updatedAt || null
+      },
+      ontology: ONTOLOGY,
+      nodes: (nodes || []).filter(Boolean),
+      edges: (edges || []).filter(Boolean)
+    };
+  }
+
+  async writeGraph(graph) {
+    await this.ensureInitialized();
+    const nextGraph = {
+      ...graph,
+      meta: {
+        ...(graph.meta || {}),
+        updatedAt: new Date().toISOString()
+      },
+      ontology: ONTOLOGY
+    };
+
+    await this.runQuery(`
+      MATCH (n)
+      DETACH DELETE n
+    `);
+
+    await this.runQuery(`
+      MERGE (m:GraphMeta {key: 'family'})
+      SET m.version = $meta.version,
+          m.title = $meta.title,
+          m.updatedAt = $meta.updatedAt
+    `, {
+      meta: nextGraph.meta
+    });
+
+    await this.runQuery(`
+      UNWIND $nodes AS node
+      CREATE (p:Person)
+      SET p = node
+    `, {
+      nodes: nextGraph.nodes
+    });
+
+    await this.runQuery(`
+      UNWIND $edges AS edge
+      MATCH (source:Person {id: edge.sourceId})
+      MATCH (target:Person {id: edge.targetId})
+      CREATE (source)-[r:KINSHIP]->(target)
+      SET r = edge
+    `, {
+      edges: nextGraph.edges
+    });
+  }
+
+  async getSnapshot() {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const materializedGraph = materializeGraph(graph);
+      if (graphsDiffer(graph, materializedGraph)) {
+        await this.writeGraph(materializedGraph);
+      }
+      return formatSnapshot(materializedGraph);
+    });
+  }
+
+  async addPerson(payload) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const person = {
+        id: createId("person"),
+        kind: "Person",
+        name: normalizeText(payload.name),
+        dateOfBirth: normalizeText(payload.dateOfBirth),
+        occupation: normalizeText(payload.occupation),
+        personalityType: normalizeText(payload.personalityType),
+        email: normalizeText(payload.email),
+        phone: normalizeText(payload.phone),
+        notes: normalizeText(payload.notes),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      if (!person.name) {
+        throw new Error("Name is required.");
+      }
+      graph.nodes.push(person);
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
+  async updatePerson(personId, payload) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const person = graph.nodes.find((node) => node.id === personId);
+      if (!person) {
+        throw new Error("Person not found.");
+      }
+      Object.assign(person, {
+        name: normalizeText(payload.name ?? person.name),
+        dateOfBirth: normalizeText(payload.dateOfBirth ?? person.dateOfBirth),
+        occupation: normalizeText(payload.occupation ?? person.occupation),
+        personalityType: normalizeText(payload.personalityType ?? person.personalityType),
+        email: normalizeText(payload.email ?? person.email),
+        phone: normalizeText(payload.phone ?? person.phone),
+        notes: normalizeText(payload.notes ?? person.notes),
+        updatedAt: new Date().toISOString()
+      });
+      if (!person.name) {
+        throw new Error("Name is required.");
+      }
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
+  async addRelationship(payload) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const sourceId = normalizeText(payload.sourceId);
+      const targetId = normalizeText(payload.targetId);
+      const type = normalizeText(payload.type);
+      if (!sourceId || !targetId) {
+        throw new Error("Both people must be selected.");
+      }
+      if (sourceId === targetId) {
+        throw new Error("A relationship must connect two different people.");
+      }
+      if (!ONTOLOGY[type]) {
+        throw new Error("Unknown relationship type.");
+      }
+      const sourceExists = graph.nodes.some((node) => node.id === sourceId);
+      const targetExists = graph.nodes.some((node) => node.id === targetId);
+      if (!sourceExists || !targetExists) {
+        throw new Error("Selected people were not found.");
+      }
+      const duplicate = graph.edges.find((edge) => (
+        edge.sourceId === sourceId &&
+        edge.targetId === targetId &&
+        edge.type === type
+      ));
+      if (duplicate) {
+        throw new Error("That relationship already exists.");
+      }
+      const created = ensureRelationshipPair(graph, {
+        sourceId,
+        targetId,
+        type,
+        origin: "explicit"
+      });
+      await this.writeGraph(materializeGraph(graph));
+      return created.primary;
+    });
+  }
+}
