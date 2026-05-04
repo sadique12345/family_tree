@@ -22,6 +22,21 @@ function compactCypher(statement) {
   return statement.replace(/\s+/g, " ").trim();
 }
 
+function serializeEdge(edge) {
+  return {
+    id: edge.id,
+    kind: edge.kind,
+    sourceId: edge.sourceId,
+    targetId: edge.targetId,
+    type: edge.type,
+    origin: edge.origin || "explicit",
+    mirroredFrom: edge.mirroredFrom || null,
+    symmetric: Boolean(edge.symmetric),
+    inferredBy: edge.inferredBy || null,
+    createdAt: edge.createdAt || null
+  };
+}
+
 export class Neo4jGraphDatabase {
   constructor(options) {
     this.httpUrl = options.httpUrl.replace(/\/$/, "");
@@ -168,7 +183,7 @@ export class Neo4jGraphDatabase {
         CREATE (source)-[r:KINSHIP]->(target)
         SET r = edge
       `, {
-        edges: nextGraph.edges
+        edges: nextGraph.edges.map(serializeEdge)
       });
     }
   }
