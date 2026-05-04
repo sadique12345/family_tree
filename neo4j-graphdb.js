@@ -10,6 +10,49 @@ import {
   normalizeText
 } from "./graph-core.js";
 
+function normalizeGenerationLane(value, fallback = undefined) {
+  if (value === undefined) {
+    return fallback;
+  }
+  const normalized = String(value).trim();
+  if (!normalized) {
+    return null;
+  }
+  const numeric = Number(normalized);
+  if (!Number.isInteger(numeric) || numeric < 1) {
+    throw new Error("Generation lane must be a whole number starting from 1.");
+  }
+  return numeric;
+}
+
+function normalizeRelationshipEntries(entries, graph, personId) {
+  if (!Array.isArray(entries)) {
+    throw new Error("Relationships payload must be a list.");
+  }
+
+  return entries
+    .map((entry) => ({
+      otherId: normalizeText(entry.otherId),
+      type: normalizeText(entry.type)
+    }))
+    .filter((entry) => entry.otherId && entry.type)
+    .map((entry) => {
+      if (entry.otherId === personId) {
+        throw new Error("A relationship must connect two different people.");
+      }
+      const otherExists = graph.nodes.some((node) => node.id === entry.otherId);
+      if (!otherExists) {
+        throw new Error("One of the related people could not be found.");
+      }
+      const definition = ONTOLOGY[entry.type];
+      if (!definition || definition.selectable === false) {
+        throw new Error(`Relationship type ${entry.type} cannot be edited here.`);
+      }
+      return entry;
+    });
+}
+
+
 function rowToObject(fields, values) {
   const result = {};
   fields.forEach((field, index) => {
@@ -212,6 +255,7 @@ export class Neo4jGraphDatabase {
         email: normalizeText(payload.email),
         phone: normalizeText(payload.phone),
         notes: normalizeText(payload.notes),
+        generationLane: normalizeGenerationLane(payload.generationLane, null),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -243,6 +287,7 @@ export class Neo4jGraphDatabase {
         email: normalizeText(payload.email ?? person.email),
         phone: normalizeText(payload.phone ?? person.phone),
         notes: normalizeText(payload.notes ?? person.notes),
+        generationLane: normalizeGenerationLane(payload.generationLane, person.generationLane ?? null),
         updatedAt: new Date().toISOString()
       });
 
@@ -301,4 +346,36 @@ export class Neo4jGraphDatabase {
       return created.primary;
     });
   }
+
+  async updatePersonGraphDetails(personId, payload) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const person = graph.nodes.find((node) => node.id === personId);
+      if (!person) {
+        throw new Error("Person not found.");
+      }
+  
+      person.generationLane = normalizeGenerationLane(payload.generationLane, person.generationLane ?? null);
+      const relationships = normalizeRelationshipEntries(payload.relationships, graph, personId);
+  
+      graph.edges = graph.edges.filter((edge) => !(
+        edge.origin === "explicit" &&
+        (edge.sourceId === personId || edge.targetId === personId)
+      ));
+  
+      relationships.forEach((relationship) => {
+        ensureRelationshipPair(graph, {
+          sourceId: personId,
+          targetId: relationship.otherId,
+          type: relationship.type,
+          origin: "explicit"
+        });
+      });
+  
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
+  
 }
