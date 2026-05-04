@@ -99,13 +99,13 @@ export class Neo4jGraphDatabase {
         coalesce(m.version, 1) AS version,
         coalesce(m.title, 'Family Graph') AS title,
         m.updatedAt AS updatedAt,
-        [node IN nodes WHERE node IS NOT NULL] AS nodes,
+        [node IN nodes WHERE node IS NOT NULL | node] AS nodes,
         [edge IN collect(
           CASE
             WHEN r IS NULL THEN null
             ELSE properties(r) + {sourceId: source.id, targetId: target.id}
           END
-        ) WHERE edge IS NOT NULL] AS edges
+        ) WHERE edge IS NOT NULL | edge] AS edges
     `);
 
     const fields = payload.data?.fields || [];
@@ -270,6 +270,7 @@ export class Neo4jGraphDatabase {
         edge.targetId === targetId &&
         edge.type === type
       ));
+
       if (duplicate) {
         throw new Error("That relationship already exists.");
       }
