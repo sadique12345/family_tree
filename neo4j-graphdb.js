@@ -103,7 +103,7 @@ export class Neo4jGraphDatabase {
         [edge IN collect(
           CASE
             WHEN r IS NULL THEN null
-            ELSE properties(r) + {sourceId: source.id, targetId: target.id}
+            ELSE r { .*, sourceId: source.id, targetId: target.id }
           END
         ) WHERE edge IS NOT NULL | edge] AS edges
     `);
