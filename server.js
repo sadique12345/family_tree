@@ -32,7 +32,7 @@ function sendJson(response, statusCode, payload) {
 function setCorsHeaders(response) {
   response.setHeader("Access-Control-Allow-Origin", allowOrigin);
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
+  response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
 }
 
 async function parseRequestBody(request) {
@@ -115,6 +115,15 @@ const server = http.createServer(async (request, response) => {
     }
 
     if (request.method === "PUT" && url.pathname.startsWith("/api/people/")) {
+      if (url.pathname.endsWith("/graph-details")) {
+        const personId = url.pathname.split("/").slice(-2)[0];
+        const payload = await parseRequestBody(request);
+        const person = await db.updatePersonGraphDetails(personId, payload);
+        broadcastGraphUpdate("person-graph-details-updated");
+        sendJson(response, 200, { person });
+        return;
+      }
+    
       const personId = url.pathname.split("/").pop();
       const payload = await parseRequestBody(request);
       const person = await db.updatePerson(personId, payload);
@@ -122,6 +131,7 @@ const server = http.createServer(async (request, response) => {
       sendJson(response, 200, { person });
       return;
     }
+
 
     if (request.method === "POST" && url.pathname === "/api/relationships") {
       const payload = await parseRequestBody(request);
