@@ -5,9 +5,9 @@ export function createDatabase({ graphFile }) {
   const backend = process.env.GRAPH_BACKEND || "file";
 
   if (backend === "neo4j") {
-    const httpUrl = "https://5eaa5b4d.databases.neo4j.io/db/5eaa5b4d/tx/commit";
-    const username = "5eaa5b4d";
-    const password = "BosMVLmr3cradeCkxwmXg98gYZigoLUgGwvKa0iVAcQ";
+    const httpUrl = process.env.NEO4J_HTTP_URL;
+    const username = process.env.NEO4J_USERNAME;
+    const password = process.env.NEO4J_PASSWORD;
 
     if (!httpUrl || !username || !password) {
       throw new Error("Neo4j mode requires NEO4J_HTTP_URL, NEO4J_USERNAME, and NEO4J_PASSWORD.");
