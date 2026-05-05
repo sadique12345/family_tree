@@ -11,6 +11,7 @@ import {
   materializeGraph,
   normalizeText
 } from "./graph-core.js";
+
 function normalizeGenerationLane(value, fallback = undefined) {
   if (value === undefined) {
     return fallback;
@@ -162,6 +163,52 @@ export class GraphDatabase {
     });
   }
 
+  async updatePersonGraphDetails(personId, payload) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const person = graph.nodes.find((node) => node.id === personId);
+      if (!person) {
+        throw new Error("Person not found.");
+      }
+
+      person.generationLane = normalizeGenerationLane(payload.generationLane, person.generationLane ?? null);
+      const relationships = normalizeRelationshipEntries(payload.relationships, graph, personId);
+
+      graph.edges = graph.edges.filter((edge) => !(
+        edge.origin === "explicit" &&
+        (edge.sourceId === personId || edge.targetId === personId)
+      ));
+
+      relationships.forEach((relationship) => {
+        ensureRelationshipPair(graph, {
+          sourceId: personId,
+          targetId: relationship.otherId,
+          type: relationship.type,
+          origin: "explicit"
+        });
+      });
+
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
+  async deletePerson(personId) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const personIndex = graph.nodes.findIndex((node) => node.id === personId);
+      if (personIndex === -1) {
+        throw new Error("Person not found.");
+      }
+
+      const [person] = graph.nodes.splice(personIndex, 1);
+      graph.edges = graph.edges.filter((edge) => edge.sourceId !== personId && edge.targetId !== personId);
+
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
   async addRelationship(payload) {
     return this.withWriteLock(async () => {
       const graph = await this.readGraph();
@@ -200,34 +247,4 @@ export class GraphDatabase {
       return created.primary;
     });
   }
-  async updatePersonGraphDetails(personId, payload) {
-    return this.withWriteLock(async () => {
-      const graph = await this.readGraph();
-      const person = graph.nodes.find((node) => node.id === personId);
-      if (!person) {
-        throw new Error("Person not found.");
-      }
-  
-      person.generationLane = normalizeGenerationLane(payload.generationLane, person.generationLane ?? null);
-      const relationships = normalizeRelationshipEntries(payload.relationships, graph, personId);
-  
-      graph.edges = graph.edges.filter((edge) => !(
-        edge.origin === "explicit" &&
-        (edge.sourceId === personId || edge.targetId === personId)
-      ));
-  
-      relationships.forEach((relationship) => {
-        ensureRelationshipPair(graph, {
-          sourceId: personId,
-          targetId: relationship.otherId,
-          type: relationship.type,
-          origin: "explicit"
-        });
-      });
-  
-      await this.writeGraph(materializeGraph(graph));
-      return { ...person, age: calculateAge(person.dateOfBirth) };
-    });
-  }
-
 }
