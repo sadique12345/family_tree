@@ -157,6 +157,46 @@ function getSelectedPerson() {
   return state.graph?.nodes.find((node) => node.id === state.selectedPersonId) || null;
 }
 
+function isSelectableRelationshipType(type, graph = state.graph) {
+  return Boolean(graph?.ontology?.[type] && graph.ontology[type].selectable !== false);
+}
+
+function relationshipScore(personId, edge) {
+  return (
+    (edge.sourceId === personId ? 1000 : 0) +
+    (edge.origin === "explicit" ? 100 : 0) +
+    (isSelectableRelationshipType(edge.type) ? 10 : 0)
+  );
+}
+
+function summarizeRelationships(graph, personId) {
+  const peopleById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const grouped = new Map();
+
+  getVisibleEdges(graph)
+    .filter((edge) => edge.sourceId === personId || edge.targetId === personId)
+    .forEach((edge) => {
+      const otherId = edge.sourceId === personId ? edge.targetId : edge.sourceId;
+      const existing = grouped.get(otherId);
+      if (!existing || relationshipScore(personId, edge) > relationshipScore(personId, existing.edge)) {
+        const perspectiveType = edge.sourceId === personId
+          ? edge.type
+          : (graph.ontology[edge.type]?.inverse || edge.type);
+        grouped.set(otherId, {
+          otherId,
+          other: peopleById.get(otherId) || null,
+          edge,
+          type: perspectiveType,
+          ontology: graph.ontology[perspectiveType] || null,
+          direction: "to",
+          editable: edge.origin === "explicit" && isSelectableRelationshipType(perspectiveType, graph)
+        });
+      }
+    });
+
+  return [...grouped.values()].sort((left, right) => (left.other?.name || "").localeCompare(right.other?.name || ""));
+}
+
 function renderPeople(graph) {
   peopleList.innerHTML = "";
   const visibleEdges = getVisibleEdges(graph);
@@ -213,16 +253,55 @@ function openEditDialog(person) {
   form.id = "editPersonForm";
   form.className = "stack";
   const escapeAttr = (value) => String(value || "").replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll("<", "&lt;");
+  const graph = state.graph;
+  const relationshipSummary = graph ? summarizeRelationships(graph, person.id) : [];
+  const editableRelationships = relationshipSummary.filter((entry) => entry.editable);
+  const readonlyRelationships = relationshipSummary.filter((entry) => !entry.editable);
+  const relationshipOptions = Object.entries(graph?.ontology || {})
+    .filter(([, definition]) => definition.selectable !== false)
+    .map(([type, definition]) => (
+      `<option value="${type}">${definition.aliases?.length ? `${definition.label} [${definition.aliases.join(", ")}]` : definition.label}</option>`
+    ))
+    .join("");
+
   form.innerHTML = `
     <div class="field-grid">
       <label><span>Name</span><input name="name" value="${escapeAttr(person.name)}" required /></label>
       <label><span>Date of birth</span><input type="date" name="dateOfBirth" value="${escapeAttr(person.dateOfBirth)}" /></label>
+      <label><span>Generation lane</span><input type="number" min="1" step="1" name="generationLane" value="${escapeAttr(person.generationLane)}" placeholder="Auto" /></label>
       <label><span>Occupation</span><input name="occupation" value="${escapeAttr(person.occupation)}" /></label>
       <label><span>Personality type</span><input name="personalityType" value="${escapeAttr(person.personalityType)}" /></label>
       <label><span>Email</span><input type="email" name="email" value="${escapeAttr(person.email)}" /></label>
       <label><span>Phone</span><input type="tel" name="phone" value="${escapeAttr(person.phone)}" /></label>
     </div>
     <label><span>Notes</span><textarea name="notes" rows="4">${escapeAttr(person.notes)}</textarea></label>
+    <div class="relationship-editor">
+      <div class="relationship-editor-head">
+        <strong>Visible relationships</strong>
+        <span>Direct connections can be changed here. Derived ones update automatically.</span>
+      </div>
+      <div class="relationship-editor-list">
+        ${editableRelationships.length ? editableRelationships.map((entry) => `
+          <label class="relationship-editor-row">
+            <span>${escapeAttr(entry.other?.name || "Unknown person")}</span>
+            <select name="relationship__${entry.otherId}">
+              <option value="">Remove direct relationship</option>
+              ${relationshipOptions}
+            </select>
+          </label>
+        `).join("") : `<p class="relationship-editor-empty">No direct visible relationships to edit yet.</p>`}
+      </div>
+      ${readonlyRelationships.length ? `
+        <div class="relationship-readonly">
+          <strong>Derived relationships</strong>
+          <ul>
+            ${readonlyRelationships.map((entry) => `
+              <li>${escapeAttr(entry.ontology?.shortLabel || entry.type)} ${entry.direction} ${escapeAttr(entry.other?.name || "Unknown")} <span>${entry.edge.origin === "inferred" ? "Derived" : "Locked"}</span></li>
+            `).join("")}
+          </ul>
+        </div>
+      ` : ""}
+    </div>
     <button type="submit" class="primary-button">Update person</button>
   `;
 
@@ -234,13 +313,38 @@ function openEditDialog(person) {
     shell.appendChild(form);
   }
 
+  editableRelationships.forEach((entry) => {
+    const select = form.querySelector(`[name="relationship__${entry.otherId}"]`);
+    if (select) {
+      select.value = entry.type;
+    }
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
+    const relationships = editableRelationships.map((entry) => ({
+      otherId: entry.otherId,
+      type: payload[`relationship__${entry.otherId}`]
+    })).filter((entry) => entry.type);
+
+    Object.keys(payload)
+      .filter((key) => key.startsWith("relationship__"))
+      .forEach((key) => {
+        delete payload[key];
+      });
+
     try {
       await request(`/api/people/${person.id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
+      });
+      await request(`/api/people/${person.id}/graph-details`, {
+        method: "PUT",
+        body: JSON.stringify({
+          generationLane: payload.generationLane,
+          relationships
+        })
       });
       await loadGraph(person.id);
       editDialog.close();
@@ -257,109 +361,133 @@ function average(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-function computeGenerationMap(nodes, edges) {
-  const generation = new Map(nodes.map((node) => [node.id, null]));
-  const incomingParents = new Map(nodes.map((node) => [node.id, []]));
-  const outgoingParents = new Map(nodes.map((node) => [node.id, []]));
-  const sameGenNeighbors = new Map(nodes.map((node) => [node.id, new Set()]));
+function buildGenerationState(nodes, edges) {
+  const parentById = new Map(nodes.map((node) => [node.id, node.id]));
+
+  function find(nodeId) {
+    const current = parentById.get(nodeId);
+    if (current === nodeId) {
+      return current;
+    }
+    const root = find(current);
+    parentById.set(nodeId, root);
+    return root;
+  }
+
+  function unite(leftId, rightId) {
+    const leftRoot = find(leftId);
+    const rightRoot = find(rightId);
+    if (leftRoot !== rightRoot) {
+      parentById.set(rightRoot, leftRoot);
+    }
+  }
 
   edges.forEach((edge) => {
-    if (PARENT_TYPES.has(edge.type)) {
-      incomingParents.get(edge.targetId)?.push(edge.sourceId);
-      outgoingParents.get(edge.sourceId)?.push(edge.targetId);
-    }
     if (SAME_GENERATION_TYPES.has(edge.type)) {
-      sameGenNeighbors.get(edge.sourceId)?.add(edge.targetId);
-      sameGenNeighbors.get(edge.targetId)?.add(edge.sourceId);
+      unite(edge.sourceId, edge.targetId);
     }
   });
 
+  const componentMembers = new Map();
   nodes.forEach((node) => {
-    if ((incomingParents.get(node.id) || []).length === 0) {
-      generation.set(node.id, 0);
+    const componentId = find(node.id);
+    if (!componentMembers.has(componentId)) {
+      componentMembers.set(componentId, []);
+    }
+    componentMembers.get(componentId).push(node);
+  });
+
+  const generationByComponent = new Map();
+  const parentComponents = new Map();
+  const childComponents = new Map();
+
+  componentMembers.forEach((members, componentId) => {
+    parentComponents.set(componentId, new Set());
+    childComponents.set(componentId, new Set());
+    const manualLanes = members
+      .map((member) => Number(member.generationLane))
+      .filter((value) => Number.isInteger(value) && value > 0)
+      .map((value) => value - 1);
+
+    generationByComponent.set(componentId, manualLanes.length ? Math.min(...manualLanes) : null);
+  });
+
+  edges.forEach((edge) => {
+    if (!PARENT_TYPES.has(edge.type)) {
+      return;
+    }
+    const parentComponent = find(edge.sourceId);
+    const childComponent = find(edge.targetId);
+    if (parentComponent === childComponent) {
+      return;
+    }
+    parentComponents.get(childComponent)?.add(parentComponent);
+    childComponents.get(parentComponent)?.add(childComponent);
+  });
+
+  componentMembers.forEach((_, componentId) => {
+    if ((parentComponents.get(componentId)?.size || 0) === 0 && generationByComponent.get(componentId) === null) {
+      generationByComponent.set(componentId, 0);
     }
   });
 
   let changed = true;
   while (changed) {
     changed = false;
-
-    nodes.forEach((node) => {
-      const nodeId = node.id;
-      const parentIds = incomingParents.get(nodeId) || [];
-      const childIds = outgoingParents.get(nodeId) || [];
-      const neighbors = [...(sameGenNeighbors.get(nodeId) || [])];
-      const current = generation.get(nodeId);
-
-      const parentValues = parentIds
-        .map((parentId) => generation.get(parentId))
+    componentMembers.forEach((_, componentId) => {
+      if (generationByComponent.get(componentId) !== null) {
+        return;
+      }
+      const parentValues = [...(parentComponents.get(componentId) || [])]
+        .map((parentId) => generationByComponent.get(parentId))
         .filter((value) => value !== null)
         .map((value) => value + 1);
-      if (parentValues.length && current === null) {
-        generation.set(nodeId, Math.round(average(parentValues)));
+      if (parentValues.length) {
+        generationByComponent.set(componentId, Math.round(average(parentValues)));
         changed = true;
         return;
       }
 
-      const childValues = childIds
-        .map((childId) => generation.get(childId))
+      const childValues = [...(childComponents.get(componentId) || [])]
+        .map((childId) => generationByComponent.get(childId))
         .filter((value) => value !== null)
         .map((value) => value - 1);
-      if (childValues.length && current === null) {
-        generation.set(nodeId, Math.round(average(childValues)));
+      if (childValues.length) {
+        generationByComponent.set(componentId, Math.round(average(childValues)));
         changed = true;
-        return;
-      }
-
-      const neighborValues = neighbors
-        .map((neighborId) => generation.get(neighborId))
-        .filter((value) => value !== null);
-      if (neighborValues.length && current === null) {
-        generation.set(nodeId, Math.round(average(neighborValues)));
-        changed = true;
-        return;
-      }
-
-      if (current !== null) {
-        neighbors.forEach((neighborId) => {
-          if (generation.get(neighborId) === null) {
-            generation.set(neighborId, current);
-            changed = true;
-          }
-        });
-        childIds.forEach((childId) => {
-          if (generation.get(childId) === null) {
-            generation.set(childId, current + 1);
-            changed = true;
-          }
-        });
-        parentIds.forEach((parentId) => {
-          if (generation.get(parentId) === null) {
-            generation.set(parentId, current - 1);
-            changed = true;
-          }
-        });
       }
     });
   }
 
-  nodes.forEach((node) => {
-    if (generation.get(node.id) === null) {
-      generation.set(node.id, 0);
+  componentMembers.forEach((_, componentId) => {
+    if (generationByComponent.get(componentId) === null) {
+      generationByComponent.set(componentId, 0);
     }
   });
 
-  const minGeneration = Math.min(...nodes.map((node) => generation.get(node.id)));
-  nodes.forEach((node) => {
-    generation.set(node.id, generation.get(node.id) - minGeneration);
+  const minGeneration = Math.min(...[...generationByComponent.values()]);
+  componentMembers.forEach((_, componentId) => {
+    generationByComponent.set(componentId, generationByComponent.get(componentId) - minGeneration);
   });
 
-  return generation;
+  const generationMap = new Map();
+  const componentMap = new Map();
+  nodes.forEach((node) => {
+    const componentId = find(node.id);
+    componentMap.set(node.id, componentId);
+    generationMap.set(node.id, generationByComponent.get(componentId));
+  });
+
+  return { generationMap, componentMap };
+}
+
+function computeGenerationMap(nodes, edges) {
+  return buildGenerationState(nodes, edges).generationMap;
 }
 
 function computeNodePositions(graph) {
   const visibleEdges = getVisibleEdges(graph);
-  const generationMap = computeGenerationMap(graph.nodes, visibleEdges);
+  const { generationMap, componentMap } = buildGenerationState(graph.nodes, visibleEdges);
   const nodesByGeneration = new Map();
 
   graph.nodes.forEach((node) => {
@@ -372,7 +500,10 @@ function computeNodePositions(graph) {
 
   const generations = [...nodesByGeneration.keys()].sort((left, right) => left - right);
   generations.forEach((level) => {
-    nodesByGeneration.get(level).sort((left, right) => left.name.localeCompare(right.name));
+    nodesByGeneration.get(level).sort((left, right) => {
+      const componentCompare = String(componentMap.get(left.id)).localeCompare(String(componentMap.get(right.id)));
+      return componentCompare || left.name.localeCompare(right.name);
+    });
   });
 
   const maxCount = Math.max(1, ...generations.map((level) => nodesByGeneration.get(level).length));
@@ -399,7 +530,8 @@ function computeNodePositions(graph) {
   return {
     nodes: positioned,
     generations,
-    generationMap
+    generationMap,
+    componentMap
   };
 }
 
@@ -457,20 +589,14 @@ function renderInspector(graph) {
 
   const visibleEdges = getVisibleEdges(graph);
   const generationMap = computeGenerationMap(graph.nodes, visibleEdges);
-  const relationships = visibleEdges.filter((edge) => edge.sourceId === person.id || edge.targetId === person.id);
-  const peopleById = new Map(graph.nodes.map((node) => [node.id, node]));
+  const relationships = summarizeRelationships(graph, person.id);
   const relationshipMarkup = relationships.length
-    ? relationships.map((edge) => {
-      const otherId = edge.sourceId === person.id ? edge.targetId : edge.sourceId;
-      const other = peopleById.get(otherId);
-      const direction = edge.sourceId === person.id ? "to" : "from";
-      return `
-        <li>
-          <strong>${edge.ontology?.shortLabel || edge.type}</strong> ${direction} ${other?.name || "Unknown"}
-          <span>${edge.origin === "inferred" ? "Derived" : "Direct"}</span>
-        </li>
-      `;
-    }).join("")
+    ? relationships.map((entry) => `
+      <li>
+        <strong>${entry.ontology?.shortLabel || entry.type}</strong> ${entry.direction} ${entry.other?.name || "Unknown"}
+        <span>${entry.edge.origin === "inferred" ? "Derived" : "Direct"}</span>
+      </li>
+    `).join("")
     : `<li>No visible connections yet.</li>`;
 
   graphInspector.innerHTML = `
@@ -485,7 +611,7 @@ function renderInspector(graph) {
       <div><span>Email</span><strong>${person.email || "Not set"}</strong></div>
       <div><span>Phone</span><strong>${person.phone || "Not set"}</strong></div>
       <div><span>Personality</span><strong>${person.personalityType || "Not set"}</strong></div>
-      <div><span>Generation lane</span><strong>${(generationMap.get(person.id) || 0) + 1}</strong></div>
+      <div><span>Generation lane</span><strong>${person.generationLane || ((generationMap.get(person.id) || 0) + 1)}</strong></div>
     </div>
     <p class="graph-inspector-notes">${person.notes || "No notes recorded for this person yet."}</p>
     <div class="graph-inspector-relations">
@@ -499,8 +625,40 @@ function renderInspector(graph) {
   });
 }
 
+function getRenderableConnections(graph) {
+  const visibleEdges = getVisibleEdges(graph);
+  if (state.selectedPersonId) {
+    return summarizeRelationships(graph, state.selectedPersonId).map((entry) => ({
+      sourceId: state.selectedPersonId,
+      targetId: entry.otherId,
+      label: entry.ontology?.shortLabel || entry.ontology?.label || entry.type,
+      origin: entry.edge.origin
+    }));
+  }
+
+  const grouped = new Map();
+  visibleEdges.forEach((edge) => {
+    const key = [edge.sourceId, edge.targetId].sort().join(":");
+    const existing = grouped.get(key);
+    const candidateScore = (edge.origin === "explicit" ? 100 : 0) + (isSelectableRelationshipType(edge.type, graph) ? 10 : 0);
+    const existingScore = existing
+      ? ((existing.origin === "explicit" ? 100 : 0) + (isSelectableRelationshipType(existing.type, graph) ? 10 : 0))
+      : -1;
+    if (!existing || candidateScore > existingScore) {
+      grouped.set(key, {
+        sourceId: edge.sourceId,
+        targetId: edge.targetId,
+        label: edge.ontology?.shortLabel || edge.ontology?.label || edge.type,
+        origin: edge.origin
+      });
+    }
+  });
+  return [...grouped.values()];
+}
+
 function renderGraph(graph) {
   const visibleEdges = getVisibleEdges(graph);
+  const renderedEdges = getRenderableConnections(graph);
   const layout = computeNodePositions(graph);
   const nodes = layout.nodes;
   const nodeMap = new Map(nodes.map((node) => [node.id, node]));
@@ -535,7 +693,7 @@ function renderGraph(graph) {
     zoomGroup.appendChild(label);
   });
 
-  visibleEdges.forEach((edge) => {
+  renderedEdges.forEach((edge) => {
     const source = nodeMap.get(edge.sourceId);
     const target = nodeMap.get(edge.targetId);
     if (!source || !target) {
@@ -557,7 +715,7 @@ function renderGraph(graph) {
     label.setAttribute("y", `${(source.y + target.y) / 2 - 8}`);
     label.setAttribute("class", "link-label");
     label.setAttribute("opacity", isActive ? "0.95" : "0.22");
-    label.textContent = edge.ontology?.shortLabel || edge.ontology?.label || edge.type;
+    label.textContent = edge.label;
     zoomGroup.appendChild(label);
   });
 
