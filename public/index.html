@@ -113,14 +113,18 @@
         </section>
 
         <section class="panel directory-panel">
-          <div class="section-heading">
-            <h2>People directory</h2>
-            <p>Profiles are editable and their ages are calculated from birth dates.</p>
-          </div>
-          <div id="peopleList" class="people-list"></div>
+          <details class="directory-box">
+            <summary class="directory-summary">
+              <span>People directory</span>
+              <span class="directory-summary-note">Tap to expand</span>
+            </summary>
+            <div class="section-heading directory-heading">
+              <p>Profiles are editable and their ages are calculated from birth dates.</p>
+            </div>
+            <div id="peopleList" class="people-list"></div>
+          </details>
         </section>
-      </main>
-    </div>
+
 
     <template id="personCardTemplate">
       <article class="person-card">
