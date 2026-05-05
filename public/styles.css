@@ -154,6 +154,36 @@ h1 {
   grid-column: span 12;
 }
 
+.directory-box {
+  background: rgba(255, 255, 255, 0.64);
+  border-radius: 22px;
+  padding: 1rem;
+}
+
+.directory-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  font-weight: 800;
+  list-style: none;
+}
+
+.directory-summary::-webkit-details-marker {
+  display: none;
+}
+
+.directory-summary-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.directory-heading {
+  margin-top: 0.9rem;
+}
+
 .section-heading {
   margin-bottom: 1rem;
 }
@@ -562,6 +592,50 @@ textarea {
   margin-bottom: 0.75rem;
 }
 
+.relationship-editor {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(246, 239, 227, 0.75);
+}
+
+.relationship-editor-head {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.relationship-editor-head span,
+.relationship-editor-empty,
+.relationship-readonly li span {
+  color: var(--muted);
+}
+
+.relationship-editor-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.relationship-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.relationship-readonly {
+  display: grid;
+  gap: 0.6rem;
+  padding-top: 0.25rem;
+}
+
+.relationship-readonly ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
 @media (max-width: 1120px) {
   .hero,
   .layout {
@@ -606,4 +680,9 @@ textarea {
   .hero-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  
+  .relationship-editor-row {
+    grid-template-columns: 1fr;
+  }
+
 }
