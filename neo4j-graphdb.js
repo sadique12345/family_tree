@@ -10,6 +10,33 @@ import {
   normalizeText
 } from "./graph-core.js";
 
+function rowToObject(fields, values) {
+  const result = {};
+  fields.forEach((field, index) => {
+    result[field] = values[index];
+  });
+  return result;
+}
+
+function compactCypher(statement) {
+  return statement.replace(/\s+/g, " ").trim();
+}
+
+function serializeEdge(edge) {
+  return {
+    id: edge.id,
+    kind: edge.kind,
+    sourceId: edge.sourceId,
+    targetId: edge.targetId,
+    type: edge.type,
+    origin: edge.origin || "explicit",
+    mirroredFrom: edge.mirroredFrom || null,
+    symmetric: Boolean(edge.symmetric),
+    inferredBy: edge.inferredBy || null,
+    createdAt: edge.createdAt || null
+  };
+}
+
 function normalizeGenerationLane(value, fallback = undefined) {
   if (value === undefined) {
     return fallback;
@@ -50,34 +77,6 @@ function normalizeRelationshipEntries(entries, graph, personId) {
       }
       return entry;
     });
-}
-
-
-function rowToObject(fields, values) {
-  const result = {};
-  fields.forEach((field, index) => {
-    result[field] = values[index];
-  });
-  return result;
-}
-
-function compactCypher(statement) {
-  return statement.replace(/\s+/g, " ").trim();
-}
-
-function serializeEdge(edge) {
-  return {
-    id: edge.id,
-    kind: edge.kind,
-    sourceId: edge.sourceId,
-    targetId: edge.targetId,
-    type: edge.type,
-    origin: edge.origin || "explicit",
-    mirroredFrom: edge.mirroredFrom || null,
-    symmetric: Boolean(edge.symmetric),
-    inferredBy: edge.inferredBy || null,
-    createdAt: edge.createdAt || null
-  };
 }
 
 export class Neo4jGraphDatabase {
@@ -250,12 +249,12 @@ export class Neo4jGraphDatabase {
         kind: "Person",
         name: normalizeText(payload.name),
         dateOfBirth: normalizeText(payload.dateOfBirth),
+        generationLane: normalizeGenerationLane(payload.generationLane, null),
         occupation: normalizeText(payload.occupation),
         personalityType: normalizeText(payload.personalityType),
         email: normalizeText(payload.email),
         phone: normalizeText(payload.phone),
         notes: normalizeText(payload.notes),
-        generationLane: normalizeGenerationLane(payload.generationLane, null),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -282,18 +281,64 @@ export class Neo4jGraphDatabase {
       Object.assign(person, {
         name: normalizeText(payload.name ?? person.name),
         dateOfBirth: normalizeText(payload.dateOfBirth ?? person.dateOfBirth),
+        generationLane: normalizeGenerationLane(payload.generationLane, person.generationLane ?? null),
         occupation: normalizeText(payload.occupation ?? person.occupation),
         personalityType: normalizeText(payload.personalityType ?? person.personalityType),
         email: normalizeText(payload.email ?? person.email),
         phone: normalizeText(payload.phone ?? person.phone),
         notes: normalizeText(payload.notes ?? person.notes),
-        generationLane: normalizeGenerationLane(payload.generationLane, person.generationLane ?? null),
         updatedAt: new Date().toISOString()
       });
 
       if (!person.name) {
         throw new Error("Name is required.");
       }
+
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
+  async updatePersonGraphDetails(personId, payload) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const person = graph.nodes.find((node) => node.id === personId);
+      if (!person) {
+        throw new Error("Person not found.");
+      }
+
+      person.generationLane = normalizeGenerationLane(payload.generationLane, person.generationLane ?? null);
+      const relationships = normalizeRelationshipEntries(payload.relationships, graph, personId);
+
+      graph.edges = graph.edges.filter((edge) => !(
+        edge.origin === "explicit" &&
+        (edge.sourceId === personId || edge.targetId === personId)
+      ));
+
+      relationships.forEach((relationship) => {
+        ensureRelationshipPair(graph, {
+          sourceId: personId,
+          targetId: relationship.otherId,
+          type: relationship.type,
+          origin: "explicit"
+        });
+      });
+
+      await this.writeGraph(materializeGraph(graph));
+      return { ...person, age: calculateAge(person.dateOfBirth) };
+    });
+  }
+
+  async deletePerson(personId) {
+    return this.withWriteLock(async () => {
+      const graph = await this.readGraph();
+      const personIndex = graph.nodes.findIndex((node) => node.id === personId);
+      if (personIndex === -1) {
+        throw new Error("Person not found.");
+      }
+
+      const [person] = graph.nodes.splice(personIndex, 1);
+      graph.edges = graph.edges.filter((edge) => edge.sourceId !== personId && edge.targetId !== personId);
 
       await this.writeGraph(materializeGraph(graph));
       return { ...person, age: calculateAge(person.dateOfBirth) };
@@ -330,7 +375,6 @@ export class Neo4jGraphDatabase {
         edge.targetId === targetId &&
         edge.type === type
       ));
-
       if (duplicate) {
         throw new Error("That relationship already exists.");
       }
@@ -346,36 +390,4 @@ export class Neo4jGraphDatabase {
       return created.primary;
     });
   }
-
-  async updatePersonGraphDetails(personId, payload) {
-    return this.withWriteLock(async () => {
-      const graph = await this.readGraph();
-      const person = graph.nodes.find((node) => node.id === personId);
-      if (!person) {
-        throw new Error("Person not found.");
-      }
-  
-      person.generationLane = normalizeGenerationLane(payload.generationLane, person.generationLane ?? null);
-      const relationships = normalizeRelationshipEntries(payload.relationships, graph, personId);
-  
-      graph.edges = graph.edges.filter((edge) => !(
-        edge.origin === "explicit" &&
-        (edge.sourceId === personId || edge.targetId === personId)
-      ));
-  
-      relationships.forEach((relationship) => {
-        ensureRelationshipPair(graph, {
-          sourceId: personId,
-          targetId: relationship.otherId,
-          type: relationship.type,
-          origin: "explicit"
-        });
-      });
-  
-      await this.writeGraph(materializeGraph(graph));
-      return { ...person, age: calculateAge(person.dateOfBirth) };
-    });
-  }
-
-  
 }
