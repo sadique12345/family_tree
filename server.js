@@ -123,7 +123,6 @@ const server = http.createServer(async (request, response) => {
         sendJson(response, 200, { person });
         return;
       }
-    
       const personId = url.pathname.split("/").pop();
       const payload = await parseRequestBody(request);
       const person = await db.updatePerson(personId, payload);
@@ -132,6 +131,13 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "DELETE" && url.pathname.startsWith("/api/people/")) {
+      const personId = url.pathname.split("/").pop();
+      const person = await db.deletePerson(personId);
+      broadcastGraphUpdate("person-deleted");
+      sendJson(response, 200, { person });
+      return;
+    }
 
     if (request.method === "POST" && url.pathname === "/api/relationships") {
       const payload = await parseRequestBody(request);
@@ -143,7 +149,6 @@ const server = http.createServer(async (request, response) => {
 
     await serveStatic(url.pathname, response);
   } catch (error) {
-    console.error("CRITICAL ERROR:", error);
     const statusCode = error instanceof SyntaxError ? 400 : 500;
     sendJson(response, statusCode, {
       error: error.message || "Unexpected error"
@@ -152,7 +157,7 @@ const server = http.createServer(async (request, response) => {
 });
 
 const port = Number(process.env.PORT || 3000);
-const host = "0.0.0.0";
+const host = process.env.HOST || "127.0.0.1";
 
 server.listen(port, host, () => {
   console.log(`Family tree app running at http://${host}:${port}`);
