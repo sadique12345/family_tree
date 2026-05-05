@@ -677,12 +677,11 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .hero-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  
   .relationship-editor-row {
     grid-template-columns: 1fr;
   }
 
+  .hero-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
